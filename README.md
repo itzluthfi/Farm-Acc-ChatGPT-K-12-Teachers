@@ -87,7 +87,7 @@ Tools Python canggih yang dirancang untuk **keperluan edukasi dan riset** dalam 
 
 pkg update && pkg upgrade
 pkg install python git
-git clone https://github.com/itzluthfi/Farm-Acc-ChatGPT-K-12-Teachers.git chatgpt-k12-verifier
+git clone https://github.com/itzluthfi/Farm-Acc-ChatGPT-K-12-Teachers-Verification-Too.git chatgpt-k12-verifier
 cd chatgpt-k12-verifier/PyRuntime_32 atau cd chatgpt-k12-verifier/PyRuntime_64
 pip install httpx requests Pillow cloudscraper
 
@@ -99,7 +99,7 @@ python script.py "URL_VERIFIKASI" [OPTIONS]
 ```bash
 sudo apt update
 sudo apt install python3 python3-pip git
-git clone https://github.com/itzluthfi/Farm-Acc-ChatGPT-K-12-Teachers.git chatgpt-k12-verifier
+git clone https://github.com/itzluthfi/Farm-Acc-ChatGPT-K-12-Teachers-Verification-Too.git chatgpt-k12-verifier
 cd chatgpt-k12-verifier/PyRuntime_32 atau cd chatgpt-k12-verifier/PyRuntime_64
 pip3 install httpx requests Pillow cloudscraper
 ```
@@ -373,8 +373,8 @@ Proyek ini dilisensikan di bawah Lisensi MIT - lihat file [LICENSE](LICENSE) unt
 ---
 
 ### 📞 Kontak & Support
-- **Repository**: [Farm-Acc-ChatGPT-K-12-Teachers](https://github.com/itzluthfi/Farm-Acc-ChatGPT-K-12-Teachers)
-- **Issues**: [GitHub Issues](https://github.com/itzluthfi/Farm-Acc-ChatGPT-K-12-Teachers/issues)
+- **Repository**: [Farm-Acc-ChatGPT-K-12-Teachers-Verification-Too](https://github.com/itzluthfi/Farm-Acc-ChatGPT-K-12-Teachers-Verification-Too)
+- **Issues**: [GitHub Issues](https://github.com/itzluthfi/Farm-Acc-ChatGPT-K-12-Teachers-Verification-Too/issues)
 - **Email**: luthfishidqi2@gmail.com
 - **Telegram**: [@itzluthfi](https://t.me/itzluthfi)
 
