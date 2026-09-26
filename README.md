@@ -326,18 +326,26 @@ Kami menerima kontribusi! Caranya:
 - Tambah metode verifikasi baru
 - Optimasi performa dan dokumentasi
 
-## ☕ Dukungan & Donasi
+## ☕ Dukungan & Apresiasi
 
-Jika tools ini bermanfaat dan membantu Anda:
+Jika tools ini bermanfaat dan menghemat waktu Anda:
 
-### 💖 Donasi via QRIS
+### 🤫 ⚠️ Peringatan: Secret Area / Easter Egg
 <details>
-<summary><b>👉 Klik di sini untuk buka QRIS (Jangan dibuka kalau nggak mau penasaran!)</b></summary>
+<summary><b>🚫 JANGAN DIKLIK! (Serius, jangan dibuka kalau nggak mau penasaran...) 🕵️‍♂️✨</b></summary>
+<br>
+<blockquote>
+  <p><b>⚠️ PERINGATAN SISTEM:</b> Waduh, kenapa malah dibuka?! 😆<br>
+  Tapi karena Anda sudah terlanjur nekat dan penasaran sampai sini... barangkali mau traktir segelas kopi lewat QRIS di bawah ini agar developer makin semangat update tools! ☕🚀</p>
+</blockquote>
 <br>
 <p align="center">
-  <img src="jangan-dibuka-kalau-ga-mau-penasaran.png" alt="QRIS Donasi" width="320" />
+  <img src="jangan-dibuka-kalau-ga-mau-penasaran.png" alt="Secret QRIS" width="320" />
 </p>
-<p align="center"><i>Terima kasih banyak atas apresiasi dan dukungannya! 🙏✨</i></p>
+<p align="center">
+  <i>"Secangkir kopi dari Anda adalah bahan bakar baris kode berikutnya."</i> ✨<br>
+  <b>Terima kasih banyak atas segala apresiasi dan dukungannya! 🙏💖</b>
+</p>
 </details>
 
 <br>
