@@ -83,7 +83,7 @@ Tools Python canggih yang dirancang untuk **keperluan edukasi dan riset** dalam 
 
 pkg update && pkg upgrade
 pkg install python git
-git clone https://github.com/MichaelJorky/ChatGPT-K-12-Teachers-Verification-Tool.git chatgpt-k12-verifier
+git clone https://github.com/itzluthfi/Farm-Acc-ChatGPT-K-12-Teachers-Verification-Too.git chatgpt-k12-verifier
 cd chatgpt-k12-verifier/PyRuntime_32 atau cd chatgpt-k12-verifier/PyRuntime_64
 pip install httpx requests Pillow cloudscraper
 
@@ -95,7 +95,7 @@ python script.py "URL_VERIFIKASI" [OPTIONS]
 ```bash
 sudo apt update
 sudo apt install python3 python3-pip git
-git clone https://github.com/MichaelJorky/ChatGPT-K-12-Teachers-Verification-Tool.git chatgpt-k12-verifier
+git clone https://github.com/itzluthfi/Farm-Acc-ChatGPT-K-12-Teachers-Verification-Too.git chatgpt-k12-verifier
 cd chatgpt-k12-verifier/PyRuntime_32 atau cd chatgpt-k12-verifier/PyRuntime_64
 pip3 install httpx requests Pillow cloudscraper
 ```
@@ -289,16 +289,18 @@ dan jalankan script lagi dengan link baru
 
 ### Struktur File
 ```
-chatgpt-k12-verifier/
+ChatGPT-K-12-Teachers-Verification-Tool/
 ├── PyRuntime_32/                # Untuk Windows 32-bit
-│   ├── script.py                # Script utama
-│   ├── run_cmd.bat              # Launcher Windows
-│   └── requirements.txt         # Dependencies
+│   ├── script.py                # Script CLI & core verifier
+│   ├── auto_k12_flow.py         # Skrip otomatisasi flow pendaftaran & verifikasi
+│   ├── run_cmd.bat              # Launcher CLI interaktif
+│   └── run_auto_k12.bat         # Launcher otomatisasi penuh
 │
 ├── PyRuntime_64/                # Untuk Windows 64-bit
-│   ├── script.py                # Script utama
-│   ├── run_cmd.bat              # Launcher Windows
-│   └── requirements.txt         # Dependencies
+│   ├── script.py                # Script CLI & core verifier
+│   ├── auto_k12_flow.py         # Skrip otomatisasi flow pendaftaran & verifikasi
+│   ├── run_cmd.bat              # Launcher CLI interaktif
+│   └── run_auto_k12.bat         # Launcher otomatisasi penuh
 │
 ├── LICENSE                      # Lisensi MIT
 └── README.md                    # Dokumentasi
@@ -316,23 +318,18 @@ Kami menerima kontribusi! Caranya:
 
 ### Area untuk Kontribusi
 - Tambah lebih banyak ID sekolah K-12
-- Improve penanganan proxy
+- Improve penanganan proxy & anti-detect browser
 - Tambah metode verifikasi baru
-- Terjemahan ke bahasa lain
-- Optimasi performa
-- Dokumentasi
+- Optimasi performa dan dokumentasi
 
 ## ☕ Dukungan
 
 Jika tools ini membantu Anda:
 
-### 💖 Support Developer
-Dukung pengembangan lebih lanjut: [https://saweria.co/teknoxpert](https://saweria.co/teknoxpert)
-
-### 📢 Sebarkan
+### 📢 Dukung Proyek
 - Beri bintang di repository ini ⭐
-- Bagikan dengan kolega
-- Laporkan issues atau saran
+- Bagikan dengan rekan developer
+- Laporkan issues atau saran perbaikan
 
 ## 📄 Lisensi
 
@@ -340,30 +337,22 @@ Proyek ini dilisensikan di bawah Lisensi MIT - lihat file [LICENSE](LICENSE) unt
 
 ## 🙏 Ucapan Terima Kasih
 
-- Layanan verifikasi ChatGPT K-12 untuk kesempatan riset
 - Komunitas open-source untuk libraries dan tools
-- Tester dan kontributor yang membantu improve tools
-- Peneliti edukasi yang mendorong batasan secara bertanggung jawab
+- Peneliti edukasi & otomasi yang bereksplorasi secara bertanggung jawab
 
 ---
 
-**Ingat**: Selalu gunakan tools dengan bertanggung jawab dan etis. Edukasi dan riset harus memberi manfaat bagi masyarakat, bukan merugikan.
+**Ingat**: Selalu gunakan tools dengan bertanggung jawab dan etis.
 
 **Selamat Mencoba!** 🚀
 
 ---
 
 ### 📞 Kontak & Support
-- **Issues**: [GitHub Issues](https://github.com/MichaelJorky/ChatGPT-K-12-Teachers-Verification-Tool/issues)
-- **Email**: wgalxczk3@mozmail.com
-- **Telegram**: [@teknoxpert](https://t.me/teknoxpert)
-- **Recommended Tool**: [SheerID Verification Assistant via Web](https://ip123.in/sheerid/)
-
-### 🔄 Update Terbaru
-- **v1.0.0**: Rilis awal dengan support Windows, Termux, Kali
-- **v1.1.0**: Tambah fitur email manual dan auto-click
-- **v1.2.0**: Optimasi untuk Windows dengan bundled runtime
-- **v1.3.0**: Tambah lebih banyak sekolah dan error handling
+- **Repository**: [Farm-Acc-ChatGPT-K-12-Teachers-Verification-Too](https://github.com/itzluthfi/Farm-Acc-ChatGPT-K-12-Teachers-Verification-Too)
+- **Issues**: [GitHub Issues](https://github.com/itzluthfi/Farm-Acc-ChatGPT-K-12-Teachers-Verification-Too/issues)
+- **Email**: luthfishidqi2@gmail.com
+- **Telegram**: [@itzluthfi](https://t.me/itzluthfi)
 
 ---
-**Dibuat dengan ❤️ oleh TeknoXpert untuk komunitas edukasi Indonesia**
+**Dikembangkan & Dipelihara oleh itzluthfi**
