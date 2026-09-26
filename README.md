@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="sticker.png" alt="ChatGPT K-12 Banner" width="400" />
+</p>
+
 # ChatGPT K-12 Teachers Verification Tool
 
 Tools Python canggih yang dirancang untuk **keperluan edukasi dan riset** dalam mengotomatisasi proses verifikasi guru K-12 dengan SheerID. Tools ini mendukung berbagai platform dan menyediakan metode koneksi fleksibel.
@@ -83,7 +87,7 @@ Tools Python canggih yang dirancang untuk **keperluan edukasi dan riset** dalam 
 
 pkg update && pkg upgrade
 pkg install python git
-git clone https://github.com/itzluthfi/Farm-Acc-ChatGPT-K-12-Teachers-Verification-Too.git chatgpt-k12-verifier
+git clone https://github.com/itzluthfi/Farm-Acc-ChatGPT-K-12-Teachers.git chatgpt-k12-verifier
 cd chatgpt-k12-verifier/PyRuntime_32 atau cd chatgpt-k12-verifier/PyRuntime_64
 pip install httpx requests Pillow cloudscraper
 
@@ -95,7 +99,7 @@ python script.py "URL_VERIFIKASI" [OPTIONS]
 ```bash
 sudo apt update
 sudo apt install python3 python3-pip git
-git clone https://github.com/itzluthfi/Farm-Acc-ChatGPT-K-12-Teachers-Verification-Too.git chatgpt-k12-verifier
+git clone https://github.com/itzluthfi/Farm-Acc-ChatGPT-K-12-Teachers.git chatgpt-k12-verifier
 cd chatgpt-k12-verifier/PyRuntime_32 atau cd chatgpt-k12-verifier/PyRuntime_64
 pip3 install httpx requests Pillow cloudscraper
 ```
@@ -322,9 +326,21 @@ Kami menerima kontribusi! Caranya:
 - Tambah metode verifikasi baru
 - Optimasi performa dan dokumentasi
 
-## ☕ Dukungan
+## ☕ Dukungan & Donasi
 
-Jika tools ini membantu Anda:
+Jika tools ini bermanfaat dan membantu Anda:
+
+### 💖 Donasi via QRIS
+<details>
+<summary><b>👉 Klik di sini untuk buka QRIS (Jangan dibuka kalau nggak mau penasaran!)</b></summary>
+<br>
+<p align="center">
+  <img src="jangan-dibuka-kalau-ga-mau-penasaran.png" alt="QRIS Donasi" width="320" />
+</p>
+<p align="center"><i>Terima kasih banyak atas apresiasi dan dukungannya! 🙏✨</i></p>
+</details>
+
+<br>
 
 ### 📢 Dukung Proyek
 - Beri bintang di repository ini ⭐
@@ -349,8 +365,8 @@ Proyek ini dilisensikan di bawah Lisensi MIT - lihat file [LICENSE](LICENSE) unt
 ---
 
 ### 📞 Kontak & Support
-- **Repository**: [Farm-Acc-ChatGPT-K-12-Teachers-Verification-Too](https://github.com/itzluthfi/Farm-Acc-ChatGPT-K-12-Teachers-Verification-Too)
-- **Issues**: [GitHub Issues](https://github.com/itzluthfi/Farm-Acc-ChatGPT-K-12-Teachers-Verification-Too/issues)
+- **Repository**: [Farm-Acc-ChatGPT-K-12-Teachers](https://github.com/itzluthfi/Farm-Acc-ChatGPT-K-12-Teachers)
+- **Issues**: [GitHub Issues](https://github.com/itzluthfi/Farm-Acc-ChatGPT-K-12-Teachers/issues)
 - **Email**: luthfishidqi2@gmail.com
 - **Telegram**: [@itzluthfi](https://t.me/itzluthfi)
 

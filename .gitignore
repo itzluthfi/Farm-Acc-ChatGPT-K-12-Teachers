@@ -2,7 +2,12 @@
 __pycache__/
 *.py[codz]
 *$py.class
-*.png
+PyRuntime_*/*.png
+current_k12_view.png
+k12_page.png
+PyRuntime_*/Scripts/*.exe
+
+
 
 
 # C extensions
