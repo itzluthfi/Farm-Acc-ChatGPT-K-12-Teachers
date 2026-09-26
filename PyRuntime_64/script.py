@@ -34,6 +34,9 @@ PROGRAM_ID = "68d47554aa292d20b9bec8f7"
 SHEERID_BASE_URL = "https://services.sheerid.com"
 
 # ============ EMAIL TEMPORARY SERVICE ============
+TEMP_TF_ACCOUNT_API = "https://temp.tf/api/account?providers=high.edu.pl,outlook.com,hotmail.com,gmail.com&dot=1&plus=1"
+TEMP_TF_CHECK_API = "https://temp.tf/api/check"
+
 GUERRILLA_MAIL_API = "https://api.guerrillamail.com/ajax.php"
 GUERRILLA_DOMAINS = [
     "sharklasers.com",         
@@ -52,7 +55,7 @@ GUERRILLA_DOMAINS = [
 ]
 
 class TempEmailService:
-    """Class untuk mengelola email temporary menggunakan API Guerrilla Mail"""
+    """Class untuk mengelola email temporary menggunakan API temp.tf (Edu & Outlook) dengan fallback Guerrilla Mail"""
     
     def __init__(self, proxy_config=None, verification_session=None, email_address=None):
         """
@@ -61,7 +64,11 @@ class TempEmailService:
         """
         self.email_address = email_address
         self.email_token = None
+        self.service_type = None  # 'temptf', 'guerrilla', or 'manual'
         self.session = requests.Session()
+        self.session.headers.update({
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
+        })
         self.verification_session = verification_session  # Session dari httpx untuk verifikasi
         
         if proxy_config:
@@ -69,13 +76,30 @@ class TempEmailService:
         
         # Jika email diberikan secara manual, tandai sebagai manual input
         self.is_manual_email = email_address is not None
+        if self.is_manual_email:
+            self.service_type = "manual"
     
     def generate_email(self):
-        """Mendapatkan alamat email (otomatis atau manual)"""
+        """Mendapatkan alamat email (prioritas temp.tf domain edu, fallback Guerrilla)"""
         if self.email_address:  # Jika sudah ada (manual input)
             print(f"   [EMAIL] Using manual email: {self.email_address}")
             return self.email_address
         
+        # 1. Coba temp.tf API terlebih dahulu (sangat disukai SheerID karena domain high.edu.pl / outlook)
+        try:
+            resp = self.session.get(TEMP_TF_ACCOUNT_API, timeout=15)
+            if resp.status_code == 200:
+                data = resp.json()
+                email = data.get("email")
+                if email and "@" in email:
+                    self.email_address = email
+                    self.service_type = "temptf"
+                    print(f"   [EMAIL] Generated via temp.tf (Edu/Clean Domain): {self.email_address}")
+                    return self.email_address
+        except Exception as e:
+            print(f"   [EMAIL WARNING] temp.tf API failed: {e}, falling back to Guerrilla...")
+        
+        # 2. Fallback: Guerrilla Mail API
         try:
             domain = random.choice(GUERRILLA_DOMAINS)
             params = {
@@ -91,212 +115,170 @@ class TempEmailService:
                 self.email_token = data.get('sid_token')
                 
                 if self.email_address and self.email_token:
-                    print(f"   [EMAIL] Generated: {self.email_address}")
+                    self.service_type = "guerrilla"
+                    print(f"   [EMAIL] Generated via Guerrilla: {self.email_address}")
                     return self.email_address
         except Exception as e:
-            print(f"   [EMAIL ERROR] API failed: {e}")
+            print(f"   [EMAIL ERROR] Guerrilla API failed: {e}")
         
-        # Fallback: generate manual
+        # 3. Fallback: generate manual random
         username = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
-        domain = random.choice(GUERRILLA_DOMAINS)
+        domain = "high.edu.pl"
         self.email_address = f"{username}@{domain}"
+        self.service_type = "fallback"
         print(f"   [EMAIL] Manual fallback: {self.email_address}")
         return self.email_address
     
     def check_for_verification_link(self, max_checks=15, delay=5):
         """Memeriksa inbox untuk link verifikasi dan OTOMATIS klik"""
-        # Jika email manual, tidak bisa akses inbox
         if self.is_manual_email:
             print(f"   [EMAIL] Manual email: {self.email_address}")
             print(f"   [EMAIL] Cannot check inbox for manual email")
             print(f"   [EMAIL] Please check your email manually for verification link")
             return None
-            
-        if not self.email_token:
+        
+        if not self.email_address:
             return None
         
-        print(f"   [EMAIL] Checking inbox for verification link...")
+        print(f"   [EMAIL] Checking inbox for verification link ({self.service_type or 'auto'})...")
         print(f"   [EMAIL] Will auto-click link if found")
         
-        for i in range(max_checks):
-            print(f"   [EMAIL] Check {i+1}/{max_checks}...")
-            time.sleep(delay)
-            
-            try:
-                params = {
-                    'f': 'get_email_list',
-                    'sid_token': self.email_token,
-                    'offset': 0
-                }
+        # A. Polling via temp.tf
+        if self.service_type == "temptf":
+            for i in range(max_checks):
+                print(f"   [EMAIL] Check {i+1}/{max_checks} (temp.tf)...")
+                time.sleep(delay)
                 
-                resp = self.session.get(GUERRILLA_MAIL_API, params=params, timeout=15)
-                
-                if resp.status_code == 200:
-                    data = resp.json()
-                    emails = data.get('list', [])
-                    
-                    for email in emails:
-                        mail_id = email.get('mail_id')
-                        mail_from = email.get('mail_from', '').lower()
-                        mail_subject = email.get('mail_subject', '').lower()
-                        
-                        # Cek jika email dari SheerID
-                        if 'sheerid' in mail_from or 'verif' in mail_subject or 'confirm' in mail_subject:
-                            print(f"   [EMAIL] Found verification email (ID: {mail_id})")
+                try:
+                    payload = {"email": self.email_address, "wait": False}
+                    resp = self.session.post(TEMP_TF_CHECK_API, json=payload, timeout=15)
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        messages = data.get("data", [])
+                        for msg in messages:
+                            msg_from = str(msg.get("from", "")).lower()
+                            msg_subject = str(msg.get("subject", "")).lower()
+                            raw_content = (msg.get("body", "") or "") + " " + (msg.get("text", "") or "") + " " + (msg.get("html", "") or "")
                             
-                            # Ekstrak dan klik link
-                            if self._auto_click_verification_link(mail_id):
-                                print(f"   [EMAIL] SUCCESS: Link clicked automatically!")
-                                return "AUTO_CLICKED"
-                            else:
-                                # Kembalikan link manual
-                                link = self._extract_link_from_email(mail_id)
+                            # Cek email dari SheerID atau subjek verifikasi
+                            if any(k in msg_from or k in msg_subject or k in raw_content.lower() for k in ["sheerid", "verif", "confirm", "teacher", "chatgpt"]):
+                                print(f"   [EMAIL] Found verification email in temp.tf: {msg.get('subject')}")
+                                
+                                link = self._extract_link_from_text(raw_content)
                                 if link:
-                                    return link
-                
-            except Exception as e:
-                print(f"   [EMAIL ERROR] Check failed: {e}")
-                continue
+                                    if self._click_verification_link(link):
+                                        print(f"   [EMAIL] SUCCESS: Link clicked automatically!")
+                                        return "AUTO_CLICKED"
+                                    else:
+                                        return link
+                except Exception as e:
+                    print(f"   [EMAIL ERROR] temp.tf check failed: {e}")
+                    continue
+            
+            print(f"   [EMAIL] No verification link found in temp.tf after {max_checks} checks")
+            return None
         
-        print(f"   [EMAIL] No verification link found after {max_checks} checks")
+        # B. Polling via Guerrilla Mail
+        if self.service_type == "guerrilla" and self.email_token:
+            for i in range(max_checks):
+                print(f"   [EMAIL] Check {i+1}/{max_checks} (guerrilla)...")
+                time.sleep(delay)
+                
+                try:
+                    params = {
+                        'f': 'get_email_list',
+                        'sid_token': self.email_token,
+                        'offset': 0
+                    }
+                    
+                    resp = self.session.get(GUERRILLA_MAIL_API, params=params, timeout=15)
+                    
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        emails = data.get('list', [])
+                        
+                        for email in emails:
+                            mail_id = email.get('mail_id')
+                            mail_from = email.get('mail_from', '').lower()
+                            mail_subject = email.get('mail_subject', '').lower()
+                            
+                            if 'sheerid' in mail_from or 'verif' in mail_subject or 'confirm' in mail_subject:
+                                print(f"   [EMAIL] Found verification email (ID: {mail_id})")
+                                
+                                fetch_params = {
+                                    'f': 'fetch_email',
+                                    'sid_token': self.email_token,
+                                    'email_id': mail_id
+                                }
+                                fetch_resp = self.session.get(GUERRILLA_MAIL_API, params=fetch_params, timeout=15)
+                                if fetch_resp.status_code == 200:
+                                    fetch_data = fetch_resp.json()
+                                    content = fetch_data.get('mail_body', '') + " " + fetch_data.get('mail_subject', '')
+                                    link = self._extract_link_from_text(content)
+                                    if link:
+                                        if self._click_verification_link(link):
+                                            print(f"   [EMAIL] SUCCESS: Link clicked automatically!")
+                                            return "AUTO_CLICKED"
+                                        return link
+                except Exception as e:
+                    print(f"   [EMAIL ERROR] Guerrilla check failed: {e}")
+                    continue
+            
+            print(f"   [EMAIL] No verification link found after {max_checks} checks")
+            return None
+        
         return None
     
-    def _auto_click_verification_link(self, mail_id):
-        """OTOMATIS klik link verifikasi dari email"""
+    def _extract_link_from_text(self, content):
+        """Ekstrak link verifikasi SheerID dari teks atau HTML"""
+        patterns = [
+            r'https://services\.sheerid\.com[^\s<>"\'\\]+',
+            r'https://verify\.sheerid\.com[^\s<>"\'\\]+',
+            r'https://[^\s<>"\'\\]*sheerid[^\s<>"\'\\]*verif[^\s<>"\'\\]*',
+        ]
+        
+        for pattern in patterns:
+            matches = re.findall(pattern, content, re.IGNORECASE)
+            if matches:
+                link = matches[0]
+                link = link.replace('&amp;', '&').replace('\\/', '/')
+                return link
+        
+        # Token patterns
+        token_patterns = [
+            r'emailToken=([a-zA-Z0-9]+)',
+            r'token=([a-zA-Z0-9]+)',
+            r'verificationId=([a-f0-9]+)'
+        ]
+        for pattern in token_patterns:
+            matches = re.findall(pattern, content, re.IGNORECASE)
+            if matches:
+                token = matches[0]
+                if 'verificationId' in pattern:
+                    return f"https://services.sheerid.com/verify/68d47554aa292d20b9bec8f7/?verificationId={token}"
+                return f"https://services.sheerid.com/verify/68d47554aa292d20b9bec8f7/?emailToken={token}"
+        
+        return None
+    
+    def _click_verification_link(self, link):
+        """OTOMATIS klik link verifikasi menggunakan session verifikasi / requests"""
         try:
-            # 1. Dapatkan konten email
-            params = {
-                'f': 'fetch_email',
-                'sid_token': self.email_token,
-                'email_id': mail_id
-            }
-            
-            resp = self.session.get(GUERRILLA_MAIL_API, params=params, timeout=15)
-            if resp.status_code != 200:
-                return False
-            
-            data = resp.json()
-            content = data.get('mail_body', '') + " " + data.get('mail_subject', '')
-            
-            # 2. Ekstrak link verifikasi
-            import re
-            link = None
-            
-            # Pattern 1: Link lengkap
-            patterns = [
-                r'https://services\.sheerid\.com[^\s<>"]+',
-                r'https://verify\.sheerid\.com[^\s<>"]+',
-                r'https://[^\s<>"]*sheerid[^\s<>"]*verif[^\s<>"]*',
-            ]
-            
-            for pattern in patterns:
-                matches = re.findall(pattern, content, re.IGNORECASE)
-                if matches:
-                    link = matches[0]
-                    # Bersihkan link
-                    link = link.replace('&amp;', '&')
-                    link = link.replace('\\/', '/')
-                    break
-            
-            if not link:
-                # Pattern 2: Cari token dan bangun link
-                token_patterns = [
-                    r'emailToken=(\d+)',
-                    r'token=(\d+)',
-                    r'verificationId=([a-f0-9]+)'
-                ]
-                
-                for pattern in token_patterns:
-                    matches = re.findall(pattern, content, re.IGNORECASE)
-                    if matches:
-                        token = matches[0]
-                        if 'emailToken' in pattern or 'token' in pattern:
-                            link = f"https://services.sheerid.com/verify/68d47554aa292d20b9bec8f7/?emailToken={token}"
-                        else:
-                            link = f"https://services.sheerid.com/verify/68d47554aa292d20b9bec8f7/?verificationId={token}"
-                        break
-            
-            if not link:
-                return False
-            
             print(f"   [EMAIL] Found link: {link[:80]}...")
-            
-            # 3. Klik link menggunakan session yang sama
-            # Gunakan session dari httpx client jika ada
             if self.verification_session:
                 try:
-                    response = self.verification_session.get(link, timeout=10)
+                    response = self.verification_session.get(link, timeout=15)
                     print(f"   [EMAIL] Auto-click status: {response.status_code}")
-                    
                     if response.status_code == 200:
-                        # Cek jika verifikasi berhasil
-                        if "verified" in response.text.lower() or "success" in response.text.lower():
-                            print(f"   [EMAIL] VERIFICATION SUCCESS via auto-click!")
-                            return True
-                        else:
-                            print(f"   [EMAIL] Page loaded, checking status...")
-                            return True
-                    else:
-                        print(f"   [EMAIL] Auto-click failed: Status {response.status_code}")
+                        return True
                 except Exception as e:
-                    print(f"   [EMAIL] Auto-click error: {e}")
+                    print(f"   [EMAIL] Auto-click session error: {e}")
             
-            # 4. Jika tidak ada session, gunakan requests session
-            try:
-                response = self.session.get(link, timeout=10)
-                print(f"   [EMAIL] Auto-click (requests) status: {response.status_code}")
-                
-                if response.status_code == 200:
-                    print(f"   [EMAIL] Link clicked successfully")
-                    return True
-            except Exception as e:
-                print(f"   [EMAIL] Requests auto-click error: {e}")
-            
-            return False
-                
+            response = self.session.get(link, timeout=15)
+            print(f"   [EMAIL] Auto-click (requests) status: {response.status_code}")
+            return response.status_code == 200
         except Exception as e:
             print(f"   [EMAIL ERROR] Auto-click failed: {e}")
             return False
-    
-    def _extract_link_from_email(self, mail_id):
-        """Ekstrak link dari email (manual)"""
-        try:
-            params = {
-                'f': 'fetch_email',
-                'sid_token': self.email_token,
-                'email_id': mail_id
-            }
-            
-            resp = self.session.get(GUERRILLA_MAIL_API, params=params, timeout=15)
-            if resp.status_code == 200:
-                data = resp.json()
-                content = data.get('mail_body', '') + " " + data.get('mail_subject', '')
-                
-                # Cari link verifikasi
-                import re
-                patterns = [
-                    r'https://services\.sheerid\.com[^\s<>"]+',
-                    r'verificationId=[a-f0-9]+',
-                    r'emailToken=\d+'
-                ]
-                
-                for pattern in patterns:
-                    matches = re.findall(pattern, content, re.IGNORECASE)
-                    for match in matches:
-                        if 'http' in match:
-                            # Bersihkan link
-                            link = match.replace('&amp;', '&')
-                            link = link.replace('\\/', '/')
-                            return link
-                        elif 'verificationId=' in match:
-                            return f"https://services.sheerid.com/verify/68d47554aa292d20b9bec8f7/?{match}"
-                        elif 'emailToken=' in match:
-                            return f"https://services.sheerid.com/verify/68d47554aa292d20b9bec8f7/?{match}"
-                        
-        except Exception as e:
-            print(f"   [EMAIL ERROR] Failed to extract link: {e}")
-        
-        return None
 
 # ============ K12 SCHOOLS (VALID IDs) ============
 K12_SCHOOLS = [
